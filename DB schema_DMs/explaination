@@ -1,0 +1,15 @@
+the users table stores the details of registered users, including their username, email, display name, and account creation time. the username and email are unique so that duplicate accounts cannot be created.
+
+the conversations table stores information about each chat, such as its type, title, creator, and creation time. the conversation type can be either direct or group.
+
+the conversation_participants table connects users with conversations. it stores each participant's role, joining time, leaving time, and last read time. the primary key uses both conversation_id and user_id to avoid adding the same user to a conversation more than once.
+
+the messages table stores the messages sent in each conversation. it includes the sender, message content, creation time, edited time, and deleted time. the foreign key ensures that the sender is a participant in that conversation.
+
+the message_receipts table tracks whether each recipient has received and read a message. it stores the delivery and read timestamps separately because each recipient may have a different message status.
+
+the foreign keys maintain relationships between users, conversations, participants, messages, and receipts. the check constraints prevent invalid values, such as an unsupported conversation type, an invalid participant role, or a read timestamp without a delivery timestamp.
+
+one tradeoff in this design is that the data is divided into multiple tables instead of storing everything together. this reduces duplicate data and makes the database easier to maintain, but retrieving complete chat details may require joins between tables.
+
+the database follows normalisation by keeping user details, conversation details, messages, and receipts in separate tables. indexes are added to commonly searched columns such as user ids, conversation ids, sender ids, and message timestamps to improve query performance in postgresql

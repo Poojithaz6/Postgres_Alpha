@@ -1,0 +1,72 @@
+Table users {
+  id bigint [pk, increment]
+  username varchar(50) [unique, not null]
+  email varchar(255) [unique, not null]
+  display_name varchar(100) [not null]
+  created_at timestamptz [default: `now()`]
+}
+
+Table conversations {
+  id bigint [pk, increment]
+  conversation_type varchar(10) [not null]
+  title varchar(120)
+  created_by bigint [not null]
+  created_at timestamptz [default: `now()`]
+}
+
+Table conversation_participants {
+  conversation_id bigint [not null]
+  user_id bigint [not null]
+  role varchar(20) [default: 'member']
+  joined_at timestamptz [default: `now()`]
+  left_at timestamptz
+  last_read_at timestamptz
+
+  indexes {
+    (conversation_id, user_id) [pk]
+    user_id
+  }
+}
+
+Table messages {
+  id bigint [pk, increment]
+  conversation_id bigint [not null]
+  sender_id bigint [not null]
+  body text [not null]
+  created_at timestamptz [default: `now()`]
+  edited_at timestamptz
+  deleted_at timestamptz
+
+  indexes {
+    (conversation_id, id) [unique]
+    (conversation_id, created_at)
+    sender_id
+  }
+}
+
+Table message_receipts {
+  conversation_id bigint [not null]
+  message_id bigint [not null]
+  recipient_id bigint [not null]
+  delivered_at timestamptz
+  read_at timestamptz
+
+  indexes {
+    (message_id, recipient_id) [pk]
+    (conversation_id, recipient_id)
+  }
+}
+
+Ref: conversations.created_by > users.id
+
+Ref: conversation_participants.conversation_id > conversations.id
+
+Ref: conversation_participants.user_id > users.id
+
+Ref: messages.conversation_id > conversations.id
+
+Ref: messages.(conversation_id, sender_id) > conversation_participants.(conversation_id, user_id)
+
+Ref: message_receipts.(conversation_id, message_id) > messages.(conversation_id, id)
+
+Ref: message_receipts.(conversation_id, recipient_id) > conversation_participants.(conversation_id, user_id)
