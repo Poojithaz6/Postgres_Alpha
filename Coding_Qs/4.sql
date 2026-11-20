@@ -1,0 +1,1 @@
+select name, manufacturer from phones where manufacturer='Apple' or manufacturer='Samsung';

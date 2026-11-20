@@ -1,0 +1,1 @@
+select name, price, price/(select max(price) from phones) as price_ratio from phones;
